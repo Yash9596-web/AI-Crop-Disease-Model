@@ -15,6 +15,7 @@ from pathlib import Path
 from typing import Dict, Any, List, Optional
 import numpy as np
 from PIL import Image
+import concurrent.futures
 from ml.universal_knowledge import UNIVERSAL_CROPS_METADATA, get_guidance_for_condition
 
 BASE_DIR = Path(__file__).resolve().parent
@@ -138,28 +139,41 @@ def _gemini_vision_predict(image: Image.Image, selected_crop: Optional[str] = No
                 f"Focus your pathological diagnosis on conditions affecting {user_crop}."
             )
 
-        # Cascade through fast Gemini vision models with active quotas
-        candidate_models = ["gemini-3.5-flash-lite", "gemini-2.5-flash", "gemini-flash-latest"]
+        # Prioritize high-availability Gemini models with active quota
+        candidate_models = ["gemini-flash-latest", "gemini-2.5-flash"]
         raw = None
-        for model_name in candidate_models:
-            try:
-                response = client.models.generate_content(
-                    model=model_name,
-                    contents=[
-                        gemini_img,
-                        GEMINI_SYSTEM_PROMPT + crop_hint
-                    ],
-                    config=types.GenerateContentConfig(
-                        response_mime_type="application/json",
-                        temperature=0.2
-                    )
+
+        def _call_model(m_name: str) -> Optional[str]:
+            res = client.models.generate_content(
+                model=m_name,
+                contents=[
+                    gemini_img,
+                    GEMINI_SYSTEM_PROMPT + crop_hint
+                ],
+                config=types.GenerateContentConfig(
+                    response_mime_type="application/json",
+                    temperature=0.2
                 )
-                if response and response.text:
-                    raw = response.text.strip()
-                    break
-            except Exception as model_err:
-                print(f"[Gemini Vision] Model {model_name} failed: {model_err}")
-                continue
+            )
+            if res and res.text:
+                return res.text.strip()
+            return None
+
+        with concurrent.futures.ThreadPoolExecutor(max_workers=1) as executor:
+            for model_name in candidate_models:
+                try:
+                    future = executor.submit(_call_model, model_name)
+                    # Limit to 8 seconds maximum per model attempt to prevent connection hanging
+                    result_text = future.result(timeout=8.0)
+                    if result_text:
+                        raw = result_text
+                        break
+                except concurrent.futures.TimeoutError:
+                    print(f"[Gemini Vision] Model {model_name} timed out after 8.0s, proceeding to next")
+                    continue
+                except Exception as model_err:
+                    print(f"[Gemini Vision] Model {model_name} failed: {model_err}")
+                    continue
 
         if not raw:
             return None

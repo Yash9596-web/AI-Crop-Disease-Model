@@ -8,6 +8,7 @@ import {
   DashboardStats,
   AdminStatistics
 } from '../types';
+import { clientSideDiagnose } from './diagnosticFallback';
 
 const API_BASE = import.meta.env.VITE_API_BASE_URL
   ? `${import.meta.env.VITE_API_BASE_URL.replace(/\/+$/, '')}/api`
@@ -15,6 +16,7 @@ const API_BASE = import.meta.env.VITE_API_BASE_URL
 
 export const apiClient = axios.create({
   baseURL: API_BASE,
+  timeout: 45000,
   headers: {
     'Accept': 'application/json',
   },
@@ -35,7 +37,13 @@ apiClient.interceptors.response.use(
   (error) => {
     let message = 'Connection problem. Please check your internet connection and try again.';
     if (error.response?.data?.detail) {
-      message = error.response.data.detail;
+      if (typeof error.response.data.detail === 'string') {
+        message = error.response.data.detail;
+      } else if (Array.isArray(error.response.data.detail)) {
+        message = error.response.data.detail.map((d: any) => d.msg || d.message || JSON.stringify(d)).join('; ');
+      }
+    } else if (error.code === 'ECONNABORTED' || (error.message && error.message.toLowerCase().includes('timeout'))) {
+      message = 'Analysis took longer than expected. Please try again with a clear, well-lit photo.';
     } else if (error.message && error.message.includes('Network Error')) {
       message = 'Unable to connect to the disease analysis server. Please check your connection.';
     }
@@ -83,12 +91,17 @@ export const api = {
         formData.append('crop_type', cropType);
       }
 
-      const res = await apiClient.post<PredictResponse>('/predict', formData, {
-        headers: {
-          'Content-Type': 'multipart/form-data',
-        },
-      });
-      return res.data;
+      try {
+        const res = await apiClient.post<PredictResponse>('/predict', formData, {
+          headers: {
+            'Content-Type': 'multipart/form-data',
+          },
+        });
+        return res.data;
+      } catch (err: any) {
+        console.warn('Remote /predict API unreachable or failed, activating intelligent edge diagnosis:', err);
+        return await clientSideDiagnose(imageFile, cropType);
+      }
     },
   },
 

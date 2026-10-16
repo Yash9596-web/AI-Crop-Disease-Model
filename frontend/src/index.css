@@ -163,6 +163,60 @@
   animation: scanningBeam 2.4s ease-in-out infinite alternate;
 }
 
+/* High-tech Leaf Vision Scanner animations */
+@keyframes leafLaserSweep {
+  0% {
+    top: 0%;
+    opacity: 0.3;
+  }
+  12% {
+    opacity: 1;
+  }
+  88% {
+    opacity: 1;
+  }
+  100% {
+    top: calc(100% - 18px);
+    opacity: 0.3;
+  }
+}
+
+@keyframes leafGridPulse {
+  0%, 100% {
+    opacity: 0.12;
+  }
+  50% {
+    opacity: 0.28;
+  }
+}
+
+@keyframes targetPulse {
+  0%, 100% {
+    transform: translate(-50%, -50%) scale(1);
+    opacity: 0.85;
+  }
+  50% {
+    transform: translate(-50%, -50%) scale(1.12);
+    opacity: 1;
+  }
+}
+
+.leaf-scan-laser {
+  animation: leafLaserSweep 2.2s cubic-bezier(0.4, 0, 0.2, 1) infinite alternate;
+}
+
+.leaf-grid-pattern {
+  background-image: 
+    linear-gradient(rgba(16, 185, 129, 0.18) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(16, 185, 129, 0.18) 1px, transparent 1px);
+  background-size: 26px 26px;
+  animation: leafGridPulse 3.5s ease-in-out infinite;
+}
+
+.leaf-target-reticle {
+  animation: targetPulse 2.2s ease-in-out infinite;
+}
+
 .animate-float-slow {
   animation: floatSlow 3.8s ease-in-out infinite;
 }

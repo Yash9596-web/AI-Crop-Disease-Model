@@ -249,26 +249,79 @@ export const UploadPage: React.FC<UploadPageProps> = ({ onAnalysisComplete }) =>
         ) : (
           /* Preview Selected Leaf Image */
           <div className="space-y-6">
-            <div className="relative rounded-3xl overflow-hidden bg-gray-950 aspect-video max-h-[360px] flex items-center justify-center border-4 border-white dark:border-emerald-950/40 shadow-xl group">
+            {/* Preview Selected Leaf Image with High-Tech Vision Scanner */}
+            <div className="relative rounded-3xl overflow-hidden bg-gray-950 aspect-video max-h-[380px] flex items-center justify-center border-4 border-emerald-500/30 dark:border-emerald-500/40 shadow-2xl group select-none">
               <img
                 src={previewUrl}
                 alt="Selected affected leaf"
-                className="w-full h-full object-contain"
+                className="w-full h-full object-contain filter contrast-105"
               />
-              {/* Futuristic Foliar Laser Scanning Beam */}
-              <div className="absolute inset-x-0 h-1 bg-gradient-to-r from-transparent via-emerald-400 to-transparent shadow-[0_0_18px_#10B981] animate-scan-beam pointer-events-none" />
 
+              {/* 1. Cyber-Botanical Micro-Grid Analysis Layer */}
+              <div className="absolute inset-0 leaf-grid-pattern pointer-events-none" />
+
+              {/* 2. Sweeping Laser Beam with Trailing Phosphor Glow Curtain */}
+              <div className="absolute inset-x-0 leaf-scan-laser pointer-events-none z-10 flex flex-col items-center">
+                {/* Neon High-Energy Laser Line */}
+                <div className="w-full h-[3px] bg-gradient-to-r from-transparent via-emerald-300 to-transparent shadow-[0_0_20px_#10B981,0_0_35px_#34D399,0_0_55px_rgba(52,211,153,0.9)]" />
+                {/* Trailing Phosphor Scan Curtain */}
+                <div className="w-full h-20 bg-gradient-to-t from-emerald-500/25 via-emerald-500/8 to-transparent" />
+              </div>
+
+              {/* 3. High-Tech Corner Viewfinder Reticles */}
+              <div className="absolute top-3.5 left-3.5 w-6 h-6 border-t-[2.5px] border-l-[2.5px] border-emerald-400 rounded-tl-lg pointer-events-none shadow-[0_0_10px_#10B981]" />
+              <div className="absolute top-3.5 right-3.5 w-6 h-6 border-t-[2.5px] border-r-[2.5px] border-emerald-400 rounded-tr-lg pointer-events-none shadow-[0_0_10px_#10B981]" />
+              <div className="absolute bottom-3.5 left-3.5 w-6 h-6 border-b-[2.5px] border-l-[2.5px] border-emerald-400 rounded-bl-lg pointer-events-none shadow-[0_0_10px_#10B981]" />
+              <div className="absolute bottom-3.5 right-3.5 w-6 h-6 border-b-[2.5px] border-r-[2.5px] border-emerald-400 rounded-br-lg pointer-events-none shadow-[0_0_10px_#10B981]" />
+
+              {/* 4. Active Target Crosshair Overlays on Leaf */}
+              <div className="absolute top-[36%] left-[44%] pointer-events-none leaf-target-reticle flex items-center gap-2">
+                <div className="relative w-7 h-7 rounded-full border border-emerald-400/90 flex items-center justify-center">
+                  <div className="w-2 h-2 rounded-full bg-emerald-400 shadow-[0_0_10px_#34D399]" />
+                  <div className="absolute -inset-1 rounded-full border border-dashed border-emerald-300/50 animate-spin" style={{ animationDuration: '7s' }} />
+                </div>
+                <span className="hidden sm:inline-block text-[10px] font-mono tracking-wider text-emerald-300 bg-black/80 px-2 py-0.5 rounded border border-emerald-500/40 backdrop-blur-md shadow-md">
+                  FOLIAR LAMINA
+                </span>
+              </div>
+
+              <div className="absolute top-[60%] left-[64%] pointer-events-none leaf-target-reticle hidden sm:flex items-center gap-2" style={{ animationDelay: '1.1s' }}>
+                <div className="relative w-6 h-6 rounded-full border border-amber-400/90 flex items-center justify-center">
+                  <div className="w-1.5 h-1.5 rounded-full bg-amber-400 shadow-[0_0_8px_#FBBF24]" />
+                </div>
+                <span className="text-[10px] font-mono tracking-wider text-amber-300 bg-black/80 px-2 py-0.5 rounded border border-amber-500/40 backdrop-blur-md shadow-md">
+                  TARGET REGION
+                </span>
+              </div>
+
+              {/* 5. Live Scanning Telemetry Status Bar */}
+              <div className="absolute top-4 left-4 z-20 flex items-center gap-2 bg-black/80 backdrop-blur-md px-3.5 py-1.5 rounded-xl border border-emerald-500/35 shadow-xl text-white text-xs">
+                <span className="relative flex h-2.5 w-2.5">
+                  <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75" />
+                  <span className="relative inline-flex rounded-full h-2.5 w-2.5 bg-emerald-500" />
+                </span>
+                <span className="font-extrabold tracking-wide uppercase text-[11px] text-emerald-300">
+                  Scanning Specimen Foliage
+                </span>
+                <span className="hidden sm:inline text-white/30">|</span>
+                <span className="hidden sm:inline font-mono text-[10px] text-gray-300">
+                  Target Locked
+                </span>
+              </div>
+
+              {/* Close / Pick Another Button */}
               <button
                 type="button"
                 onClick={clearSelection}
                 disabled={isAnalyzing}
-                className="absolute top-4 right-4 p-2 rounded-full bg-black/60 hover:bg-black/80 text-white transition-all shadow-md btn-tactile"
+                className="absolute top-4 right-4 z-20 p-2 rounded-full bg-black/70 hover:bg-black/90 text-white transition-all shadow-md border border-white/10 btn-tactile"
                 title="Remove and pick another"
               >
                 <X className="w-5 h-5" />
               </button>
 
-              <div className="absolute bottom-4 left-4 bg-black/70 backdrop-blur-md px-3.5 py-1.5 rounded-xl text-xs font-semibold text-white flex items-center gap-2 border border-white/10 shadow-lg">
+              {/* File Info Pill */}
+              <div className="absolute bottom-4 left-4 z-20 bg-black/80 backdrop-blur-md px-3.5 py-1.5 rounded-xl text-xs font-semibold text-white flex items-center gap-2 border border-white/15 shadow-xl">
                 <FileCheck className="w-4 h-4 text-emerald-400" />
                 <span>{selectedFile?.name} ({(selectedFile ? selectedFile.size / 1024 : 0).toFixed(1)} KB)</span>
               </div>

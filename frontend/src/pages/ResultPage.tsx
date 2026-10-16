@@ -73,7 +73,6 @@ export const ResultPage: React.FC<ResultPageProps> = ({
       ];
 
   const chemicalDisclaimer = treatmentObj.chemical_disclaimer || "Always verify approved chemical active ingredients with your local agricultural extension service.";
-  const safetyDisclaimer = result.safety_disclaimer || "This AI prediction is intended as an initial screening and educational aid. For significant crop damage or uncertain results, consult a qualified agricultural expert.";
 
   // Safe Symptoms Normalization
   const symptomsList: string[] = Array.isArray(result.symptoms) && result.symptoms.length > 0
@@ -500,13 +499,6 @@ export const ResultPage: React.FC<ResultPageProps> = ({
         </div>
       </div>
 
-      {/* Important Safety Banner */}
-      <div className="rounded-2xl p-4 bg-amber-50 dark:bg-amber-950/40 border border-amber-200 dark:border-amber-800/40 text-amber-950 dark:text-amber-200 text-xs sm:text-sm flex items-start gap-3">
-        <Info className="w-5 h-5 text-amber-600 dark:text-amber-400 shrink-0 mt-0.5" />
-        <p className="leading-relaxed">
-          {safetyDisclaimer}
-        </p>
-      </div>
 
       {/* Bottom Navigation CTAs */}
       <div className="flex flex-col sm:flex-row items-center justify-between gap-4 pt-4">

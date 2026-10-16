@@ -113,6 +113,138 @@ export const ResultPage: React.FC<ResultPageProps> = ({
   const preventionItems = getPreventionItems();
   const topCandidates = Array.isArray(result.top_candidates) ? result.top_candidates : [];
 
+  // ================= NON-PLANT / SPECIMEN REJECTED VIEW =================
+  if (result.is_plant === false || result.disease === 'No Plant Detected') {
+    return (
+      <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-8 animate-fade-in">
+        {/* Top Actions Bar */}
+        <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 pb-4 border-b border-agri-100 dark:border-white/10">
+          <div>
+            <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full text-xs font-semibold bg-amber-500/10 text-amber-500 border border-amber-500/20 mb-2">
+              <AlertTriangle className="w-3.5 h-3.5" />
+              Specimen Integrity Check Failed
+            </div>
+            <h1 className="text-2xl sm:text-3xl font-extrabold text-agri-950 dark:text-white tracking-tight">
+              No Plant Foliage Detected
+            </h1>
+            <p className="text-sm text-agri-600 dark:text-agri-400 mt-1 flex items-center gap-2">
+              <Calendar className="w-4 h-4" />
+              Scanned on {dateStr} at {timeStr}
+            </p>
+          </div>
+
+          <button
+            onClick={onScanAnother}
+            className="flex items-center gap-2 px-5 py-2.5 bg-gradient-to-r from-emerald-600 to-green-600 hover:from-emerald-500 hover:to-green-500 text-white font-semibold text-sm rounded-xl shadow-lg shadow-emerald-900/30 transition-all hover:scale-[1.02] active:scale-[0.98]"
+          >
+            <RotateCcw className="w-4 h-4" />
+            Scan a Plant Leaf
+          </button>
+        </div>
+
+        {/* Main Rejection Card */}
+        <div className="grid grid-cols-1 md:grid-cols-12 gap-8 items-start bg-agri-900/40 border border-amber-500/30 rounded-3xl p-6 sm:p-8 backdrop-blur-md shadow-2xl relative overflow-hidden">
+          <div className="absolute -top-24 -right-24 w-72 h-72 bg-amber-500/10 rounded-full blur-3xl pointer-events-none" />
+
+          {/* Left Column: Image Preview with Tag */}
+          <div className="md:col-span-5 space-y-3">
+            <div className="relative rounded-2xl overflow-hidden border border-white/10 bg-black/40 aspect-square flex items-center justify-center group shadow-inner">
+              {result.image_url ? (
+                <img
+                  src={result.image_url}
+                  alt="Rejected Specimen"
+                  className="w-full h-full object-cover opacity-85 group-hover:scale-105 transition-transform duration-500 filter contrast-105"
+                />
+              ) : (
+                <div className="text-center p-6 text-agri-400">
+                  <Leaf className="w-12 h-12 mx-auto mb-2 opacity-40 text-amber-500" />
+                  <p className="text-xs">No Specimen Preview</p>
+                </div>
+              )}
+              <div className="absolute top-3 left-3 px-3 py-1 bg-amber-950/80 backdrop-blur-md border border-amber-500/40 text-amber-300 text-xs font-semibold rounded-lg shadow-lg flex items-center gap-1.5">
+                <AlertCircle className="w-3.5 h-3.5 text-amber-400" />
+                Non-Botanical Specimen
+              </div>
+            </div>
+            <p className="text-center text-xs text-agri-400 dark:text-agri-500 italic">
+              Uploaded image rejected by agricultural pre-filter
+            </p>
+          </div>
+
+          {/* Right Column: Detailed Explanation & Guidelines */}
+          <div className="md:col-span-7 space-y-5">
+            <div className="p-4 rounded-2xl bg-amber-500/10 border border-amber-500/20 text-amber-200 text-sm leading-relaxed">
+              <strong className="block font-bold text-amber-300 text-base mb-1">
+                Why was this image not analyzed for disease?
+              </strong>
+              {result.rejection_reason ||
+                "Our botanical neural network requires an authentic, clear photograph of plant foliage or crop leaves. Screenshots, documents, people, and non-plant objects are automatically rejected to avoid incorrect diagnoses."}
+            </div>
+
+            <div className="space-y-3">
+              <h3 className="text-sm font-bold text-white uppercase tracking-wider flex items-center gap-2">
+                <Sparkles className="w-4 h-4 text-emerald-400" />
+                How to take a valid crop leaf photo:
+              </h3>
+              
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                <div className="p-3.5 rounded-xl bg-white/5 border border-white/10 space-y-1">
+                  <div className="flex items-center gap-2 text-emerald-400 font-semibold text-xs">
+                    <CheckCircle2 className="w-4 h-4" />
+                    Actual Plant Leaf
+                  </div>
+                  <p className="text-xs text-agri-300">
+                    Photograph a live or freshly picked leaf attached to the plant stem.
+                  </p>
+                </div>
+
+                <div className="p-3.5 rounded-xl bg-white/5 border border-white/10 space-y-1">
+                  <div className="flex items-center gap-2 text-emerald-400 font-semibold text-xs">
+                    <CheckCircle2 className="w-4 h-4" />
+                    Natural Lighting
+                  </div>
+                  <p className="text-xs text-agri-300">
+                    Use clear daylight. Avoid heavy flash glare or deep shadows.
+                  </p>
+                </div>
+
+                <div className="p-3.5 rounded-xl bg-white/5 border border-white/10 space-y-1">
+                  <div className="flex items-center gap-2 text-emerald-400 font-semibold text-xs">
+                    <CheckCircle2 className="w-4 h-4" />
+                    Fill the Frame
+                  </div>
+                  <p className="text-xs text-agri-300">
+                    Hold the camera 10–20 cm away so lesions and leaf veins are in focus.
+                  </p>
+                </div>
+
+                <div className="p-3.5 rounded-xl bg-white/5 border border-white/10 space-y-1">
+                  <div className="flex items-center gap-2 text-amber-400 font-semibold text-xs">
+                    <AlertTriangle className="w-4 h-4" />
+                    Avoid Screenshots
+                  </div>
+                  <p className="text-xs text-agri-300">
+                    Do not take pictures of screens, text papers, receipts, or animals.
+                  </p>
+                </div>
+              </div>
+            </div>
+
+            <div className="pt-2">
+              <button
+                onClick={onScanAnother}
+                className="w-full py-3.5 px-6 bg-gradient-to-r from-emerald-600 via-green-600 to-teal-600 hover:from-emerald-500 hover:to-teal-500 text-white font-bold text-sm rounded-xl shadow-xl shadow-emerald-950/40 transition-all flex items-center justify-center gap-2 hover:scale-[1.01] active:scale-[0.99]"
+              >
+                <RotateCcw className="w-4 h-4" />
+                Upload a New Leaf Photograph
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-8">
       

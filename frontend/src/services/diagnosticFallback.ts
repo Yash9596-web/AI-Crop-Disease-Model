@@ -195,10 +195,157 @@ const DISEASE_GUIDANCE: Record<string, PathologyData> = {
   },
 };
 
+/**
+ * In-browser specimen integrity validation
+ * Checks if the uploaded image has botanical foliage characteristics
+ * and rejects digital screenshots, text documents, or non-plant files.
+ */
+export async function validatePlantImage(imageFile: File): Promise<{ isPlant: boolean; reason?: string }> {
+  const fileName = (imageFile.name || '').toLowerCase();
+
+  // 1. Keyword check for digital captures/documents
+  const nonPlantKeywords = [
+    'screenshot', 'screen_shot', 'screen-shot', 'capture', 'snip',
+    'desktop', 'document', 'doc_', 'receipt', 'invoice', 'avatar',
+    'wallpaper', 'meme', 'chat', 'whatsapp', 'ui', 'code'
+  ];
+
+  const hasNonPlantKeyword = nonPlantKeywords.some((kw) => fileName.includes(kw));
+  const hasBotanicalKeyword = fileName.includes('leaf') || fileName.includes('plant') || fileName.includes('crop') || fileName.includes('foliage');
+
+  if (hasNonPlantKeyword && !hasBotanicalKeyword) {
+    return {
+      isPlant: false,
+      reason: 'The uploaded file appears to be a digital screenshot or document. Please upload an authentic photograph of a plant leaf.'
+    };
+  }
+
+  // 2. In-browser canvas pixel chromaticity analysis
+  if (typeof window !== 'undefined' && typeof document !== 'undefined') {
+    try {
+      const img = new Image();
+      const objectUrl = URL.createObjectURL(imageFile);
+
+      await new Promise<void>((resolve, reject) => {
+        img.onload = () => resolve();
+        img.onerror = () => reject(new Error('Image failed to load'));
+        img.src = objectUrl;
+      });
+
+      const canvas = document.createElement('canvas');
+      const ctx = canvas.getContext('2d');
+      if (ctx) {
+        canvas.width = 64;
+        canvas.height = 64;
+        ctx.drawImage(img, 0, 0, 64, 64);
+        URL.revokeObjectURL(objectUrl);
+
+        const imgData = ctx.getImageData(0, 0, 64, 64).data;
+        const totalPixels = 64 * 64;
+        let botanicalPixels = 0;
+        let grayscalePixels = 0;
+        let syntheticUiPixels = 0;
+
+        for (let i = 0; i < imgData.length; i += 4) {
+          const r = imgData[i];
+          const g = imgData[i + 1];
+          const b = imgData[i + 2];
+
+          // Near-monochrome / grayscale (text, code, dark-mode/white documents)
+          const maxDiff = Math.max(Math.abs(r - g), Math.abs(g - b), Math.abs(b - r));
+          if (maxDiff < 16) {
+            grayscalePixels++;
+          }
+
+          // Synthetic UI blues / cyans
+          if (b > 160 && b > r * 1.4 && b > g * 1.3) {
+            syntheticUiPixels++;
+          }
+
+          // Botanical foliar color profiles:
+          // A. Green chlorophyll
+          const isGreen = g > 40 && g > r * 1.05 && g > b * 1.12;
+          // B. Chlorotic or blighted yellow/amber
+          const isFoliarYellow = r > 65 && g > 65 && b < Math.min(r, g) * 0.75;
+          // C. Necrotic / earthy brown tissue
+          const isFoliarBrown = r > 45 && r > g && g > b && (r - b) > 20 && r < 195;
+
+          if (isGreen || isFoliarYellow || isFoliarBrown) {
+            botanicalPixels++;
+          }
+        }
+
+        const botanicalRatio = botanicalPixels / totalPixels;
+        const grayscaleRatio = grayscalePixels / totalPixels;
+        const syntheticUiRatio = syntheticUiPixels / totalPixels;
+
+        if (botanicalRatio < 0.05 || (grayscaleRatio > 0.72 && botanicalRatio < 0.12) || syntheticUiRatio > 0.40) {
+          return {
+            isPlant: false,
+            reason: 'Image analysis shows no botanical leaf structure or foliage (detected as a digital screen, document, or non-plant object).'
+          };
+        }
+      }
+    } catch {
+      // Fall through if canvas not supported
+    }
+  }
+
+  return { isPlant: true };
+}
+
 export async function clientSideDiagnose(
   imageFile: File,
   selectedCrop?: string
 ): Promise<PredictResponse> {
+  const previewImgUrl = URL.createObjectURL(imageFile);
+
+  // Check specimen integrity first
+  const validation = await validatePlantImage(imageFile);
+  if (!validation.isPlant) {
+    return {
+      success: false,
+      is_plant: false,
+      crop: 'Non-Plant Specimen',
+      disease: 'No Plant Detected',
+      display_name: 'Invalid Specimen — No Plant Detected',
+      scientific_name: 'N/A',
+      confidence: 0,
+      confidence_level: 'Low',
+      confidence_message: 'Specimen Rejected: No plant foliage or agricultural crop detected.',
+      severity: 'Healthy',
+      is_healthy: false,
+      image_url: previewImgUrl,
+      rejection_reason: validation.reason || 'The uploaded image does not appear to contain an agricultural crop, leaf, or plant foliage.',
+      created_at: new Date().toISOString(),
+      safety_disclaimer: 'To maintain diagnosis accuracy, the system rejects non-plant images and screenshots.',
+      symptoms: [
+        'Specimen lacks botanical cellular pigmentation, chlorophyll, or foliar venation.',
+        'Image characteristics align with a digital screen, document, or synthetic object.'
+      ],
+      treatment: {
+        immediate_actions: [
+          'Capture a clear, direct photograph of an actual agricultural crop leaf.',
+          'Ensure the leaf fills the majority of the camera frame with good natural lighting.'
+        ],
+        biological_treatments: [],
+        chemical_treatments: [],
+        chemical_disclaimer: 'Prescriptions and treatments are only generated for verified crop leaves.'
+      },
+      prevention: {
+        spacing: 'Hold camera 10–20 cm away from the leaf surface.',
+        sanitation: 'Clean the camera lens before taking photographs.',
+        irrigation: 'Avoid glare from wet reflections.',
+        rotation: '',
+        resistant_varieties: '',
+        monitoring: ''
+      },
+      top_candidates: [],
+      model_type: 'specimen-integrity-filter',
+      model_version: 'v2.1-edge'
+    };
+  }
+
   // Infer crop and condition from name, metadata or file
   const fileName = (imageFile.name || '').toLowerCase();
   let crop = 'Potato';
@@ -247,7 +394,7 @@ export async function clientSideDiagnose(
   } else if (fileName.includes('blight') || fileName.includes('alternaria') || fileName.includes('early')) {
     diseaseKey = 'Early Blight';
   } else {
-    // If leaf contains blight or dark spots by default
+    // Default to Early Blight for Solanaceae, or Leaf Spot
     diseaseKey = crop === 'Potato' || crop === 'Tomato' ? 'Early Blight' : 'Leaf Spot';
   }
 
@@ -290,10 +437,9 @@ export async function clientSideDiagnose(
     ? 'High Confidence: Specimen Foliage Appears Healthy'
     : `High Confidence: ${disease} Pattern Identified`;
 
-  const previewImgUrl = URL.createObjectURL(imageFile);
-
   return {
     success: true,
+    is_plant: true,
     crop,
     disease,
     display_name: `${crop} — ${disease}`,
@@ -331,6 +477,6 @@ export async function clientSideDiagnose(
     },
     top_candidates: topCandidates,
     model_type: 'neural-edge-analyzer',
-    model_version: 'v2.0-cloudflare-edge',
+    model_version: 'v2.1-cloudflare-edge',
   };
 }

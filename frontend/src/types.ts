@@ -59,6 +59,9 @@ export interface TopCandidate {
 
 export interface PredictResponse {
   success: boolean;
+  is_plant?: boolean;
+  rejection_reason?: string;
+  error?: string;
   detection_id?: number;
   crop: string;
   disease: string;
@@ -75,6 +78,8 @@ export interface PredictResponse {
   top_candidates: TopCandidate[];
   safety_disclaimer: string;
   created_at: string;
+  model_type?: string;
+  model_version?: string;
 }
 
 export interface Detection {

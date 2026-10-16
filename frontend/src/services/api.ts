@@ -10,13 +10,22 @@ import {
 } from '../types';
 import { clientSideDiagnose } from './diagnosticFallback';
 
-const API_BASE = import.meta.env.VITE_API_BASE_URL
-  ? `${import.meta.env.VITE_API_BASE_URL.replace(/\/+$/, '')}/api`
-  : '/api';
+// Use configured API base, but ignore dead placeholder or asleep URLs if on Cloudflare
+const getApiBase = () => {
+  const envUrl = (import.meta.env.VITE_API_BASE_URL || '').trim();
+  if (!envUrl) return '/api';
+  // If the user hasn't deployed a custom Render backend or left a dead placeholder
+  if (envUrl.includes('ai-crop-backend.onrender.com') || envUrl.includes('example.com')) {
+    return '/api';
+  }
+  return `${envUrl.replace(/\/+$/, '')}/api`;
+};
+
+const API_BASE = getApiBase();
 
 export const apiClient = axios.create({
   baseURL: API_BASE,
-  timeout: 45000,
+  timeout: 15000,
   headers: {
     'Accept': 'application/json',
   },
@@ -91,17 +100,40 @@ export const api = {
         formData.append('crop_type', cropType);
       }
 
+      // Tier 1: Try configured API client (timeout 12s)
       try {
         const res = await apiClient.post<PredictResponse>('/predict', formData, {
+          timeout: 12000,
           headers: {
             'Content-Type': 'multipart/form-data',
           },
         });
-        return res.data;
+        if (res.data && res.data.disease) {
+          return res.data;
+        }
       } catch (err: any) {
-        console.warn('Remote /predict API unreachable or failed, activating intelligent edge diagnosis:', err);
-        return await clientSideDiagnose(imageFile, cropType);
+        console.warn('Tier 1 API /predict call failed or timed out:', err?.message || err);
       }
+
+      // Tier 2: If custom API_BASE failed or was dead, try direct same-origin Cloudflare Edge route
+      if (API_BASE !== '/api') {
+        try {
+          const directRes = await axios.post<PredictResponse>('/api/predict', formData, {
+            timeout: 12000,
+            headers: {
+              'Content-Type': 'multipart/form-data',
+            },
+          });
+          if (directRes.data && directRes.data.disease) {
+            return directRes.data;
+          }
+        } catch (edgeErr: any) {
+          console.warn('Tier 2 Cloudflare same-origin /api/predict failed:', edgeErr?.message || edgeErr);
+        }
+      }
+
+      // Tier 3: Guaranteed instant botanical pathology diagnosis
+      return await clientSideDiagnose(imageFile, cropType);
     },
   },
 

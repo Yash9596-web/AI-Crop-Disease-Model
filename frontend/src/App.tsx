@@ -14,6 +14,7 @@ import { HistoryPage } from './pages/HistoryPage';
 import { AdminPage } from './pages/AdminPage';
 import { PredictResponse, Detection } from './types';
 import { api } from './services/api';
+import { ErrorBoundary } from './components/ErrorBoundary';
 
 const AppContent: React.FC = () => {
   const [currentTab, setCurrentTab] = useState<string>('home');
@@ -139,7 +140,9 @@ const AppContent: React.FC = () => {
           <Navbar currentTab={currentTab} onNavigate={setCurrentTab} />
         </div>
         <main className="flex-1 pb-16 md:pb-0">
-          {renderContent()}
+          <ErrorBoundary fallbackTab={setCurrentTab}>
+            {renderContent()}
+          </ErrorBoundary>
         </main>
       </div>
 

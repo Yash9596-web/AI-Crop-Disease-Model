@@ -137,7 +137,12 @@ export const UploadPage: React.FC<UploadPageProps> = ({ onAnalysisComplete }) =>
       setAnalysisStep(5);
       setTimeout(() => {
         setIsAnalyzing(false);
-        onAnalysisComplete(response);
+        const enrichedResult = {
+          ...response,
+          image_url: response.image_url || previewUrl || '',
+          created_at: response.created_at || new Date().toISOString(),
+        };
+        onAnalysisComplete(enrichedResult as any);
       }, 500);
     } catch (err: any) {
       clearInterval(stepInterval);

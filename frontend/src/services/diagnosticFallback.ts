@@ -290,6 +290,8 @@ export async function clientSideDiagnose(
     ? 'High Confidence: Specimen Foliage Appears Healthy'
     : `High Confidence: ${disease} Pattern Identified`;
 
+  const previewImgUrl = URL.createObjectURL(imageFile);
+
   return {
     success: true,
     crop,
@@ -301,9 +303,32 @@ export async function clientSideDiagnose(
     confidence_message: confidenceMessage,
     severity,
     is_healthy: isHealthy,
+    image_url: previewImgUrl,
+    created_at: new Date().toISOString(),
+    safety_disclaimer: "This AI prediction is intended as an initial screening and educational aid. For significant crop damage or uncertain results, consult a qualified agricultural expert.",
     symptoms: pathology.symptoms,
-    treatment: pathology.treatment,
-    prevention: pathology.prevention,
+    treatment: {
+      immediate_actions: [
+        pathology.treatment.immediate_action,
+        "Isolate diseased plant tissue and avoid handling surrounding healthy plants when foliage is wet."
+      ],
+      biological_treatments: [
+        pathology.treatment.biological_ipm
+      ],
+      chemical_treatments: [
+        pathology.treatment.chemical
+      ],
+      chemical_disclaimer: "Always verify approved chemical active ingredients with your local agricultural extension service.",
+      expert_notes: "Scout surrounding crop canopy twice weekly during high humidity periods."
+    },
+    prevention: {
+      spacing: "Maintain recommended row spacing (45–60 cm) to ensure adequate airflow and sunlight penetration.",
+      sanitation: "Remove weed hosts, volunteer nightshades, and diseased crop residues post-harvest.",
+      irrigation: "Utilize drip irrigation to keep leaf surfaces dry and avoid fungal spore splash.",
+      rotation: "Rotate non-host botanical families every 2 to 3 years to break pathogen life cycles.",
+      resistant_varieties: "Select certified disease-resistant hybrid seed and seedling stocks.",
+      monitoring: "Scout fields at least twice weekly during high-humidity or persistent rainfall periods."
+    },
     top_candidates: topCandidates,
     model_type: 'neural-edge-analyzer',
     model_version: 'v2.0-cloudflare-edge',

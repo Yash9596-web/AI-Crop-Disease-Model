@@ -147,7 +147,7 @@ Respond with ONLY a valid JSON object matching this schema:
   }
 }`;
 
-        const candidateModels = ['gemini-1.5-flash', 'gemini-2.0-flash', 'gemini-2.5-flash', 'gemini-flash-latest'];
+        const candidateModels = ['gemini-2.5-flash', 'gemini-flash-latest', 'gemini-2.0-flash', 'gemini-1.5-flash'];
         let geminiData = null;
 
         for (const modelName of candidateModels) {

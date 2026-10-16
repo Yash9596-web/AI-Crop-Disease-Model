@@ -18,10 +18,8 @@ import {
   ShieldCheck,
   FileCheck,
   SlidersHorizontal,
-  Check,
-  Key
+  Check
 } from 'lucide-react';
-import { GeminiKeyModal } from '../components/ui/GeminiKeyModal';
 
 interface UploadPageProps {
   onAnalysisComplete: (result: PredictResponse) => void;
@@ -33,7 +31,6 @@ export const UploadPage: React.FC<UploadPageProps> = ({ onAnalysisComplete }) =>
   const [previewUrl, setPreviewUrl] = useState<string | null>(null);
   const [selectedCrop, setSelectedCrop] = useState<string | null>(null); // null = 100% Automatic AI Crop Detection
   const [showManualCropSelector, setShowManualCropSelector] = useState(false);
-  const [showKeyModal, setShowKeyModal] = useState(false);
   const [isDragging, setIsDragging] = useState(false);
   const [isAnalyzing, setIsAnalyzing] = useState(false);
   const [analysisStep, setAnalysisStep] = useState<number>(0);
@@ -166,17 +163,7 @@ export const UploadPage: React.FC<UploadPageProps> = ({ onAnalysisComplete }) =>
           {t.uploadSubtitle}
         </p>
 
-        {/* Gemini Vision API Key Status / Config trigger */}
-        <div className="mt-4 inline-flex items-center gap-2">
-          <button
-            onClick={() => setShowKeyModal(true)}
-            className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-semibold bg-emerald-500/10 text-emerald-400 border border-emerald-500/25 hover:bg-emerald-500/20 transition-all shadow-xs"
-          >
-            <Sparkles className="w-3.5 h-3.5" />
-            Gemini Multimodal AI Vision
-            <Key className="w-3 h-3 ml-1 text-emerald-300 opacity-75" />
-          </button>
-        </div>
+
       </div>
 
       {/* Main Upload Card */}
@@ -480,8 +467,6 @@ export const UploadPage: React.FC<UploadPageProps> = ({ onAnalysisComplete }) =>
         </div>
       )}
 
-      {/* Gemini AI Key Modal */}
-      <GeminiKeyModal isOpen={showKeyModal} onClose={() => setShowKeyModal(false)} />
 
     </div>
   );

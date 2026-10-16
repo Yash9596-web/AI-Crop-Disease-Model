@@ -18,8 +18,10 @@ import {
   ShieldCheck,
   FileCheck,
   SlidersHorizontal,
-  Check
+  Check,
+  Key
 } from 'lucide-react';
+import { GeminiKeyModal } from '../components/ui/GeminiKeyModal';
 
 interface UploadPageProps {
   onAnalysisComplete: (result: PredictResponse) => void;
@@ -31,6 +33,7 @@ export const UploadPage: React.FC<UploadPageProps> = ({ onAnalysisComplete }) =>
   const [previewUrl, setPreviewUrl] = useState<string | null>(null);
   const [selectedCrop, setSelectedCrop] = useState<string | null>(null); // null = 100% Automatic AI Crop Detection
   const [showManualCropSelector, setShowManualCropSelector] = useState(false);
+  const [showKeyModal, setShowKeyModal] = useState(false);
   const [isDragging, setIsDragging] = useState(false);
   const [isAnalyzing, setIsAnalyzing] = useState(false);
   const [analysisStep, setAnalysisStep] = useState<number>(0);
@@ -156,12 +159,24 @@ export const UploadPage: React.FC<UploadPageProps> = ({ onAnalysisComplete }) =>
       
       {/* Header */}
       <div className="text-center mb-8">
-        <h1 className="text-3xl sm:text-4xl font-extrabold text-agri-950 tracking-tight">
+        <h1 className="text-3xl sm:text-4xl font-extrabold text-agri-950 dark:text-white tracking-tight">
           {t.uploadTitle}
         </h1>
-        <p className="text-gray-600 text-sm sm:text-base mt-2 max-w-xl mx-auto">
+        <p className="text-gray-600 dark:text-agri-400 text-sm sm:text-base mt-2 max-w-xl mx-auto">
           {t.uploadSubtitle}
         </p>
+
+        {/* Gemini Vision API Key Status / Config trigger */}
+        <div className="mt-4 inline-flex items-center gap-2">
+          <button
+            onClick={() => setShowKeyModal(true)}
+            className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-semibold bg-emerald-500/10 text-emerald-400 border border-emerald-500/25 hover:bg-emerald-500/20 transition-all shadow-xs"
+          >
+            <Sparkles className="w-3.5 h-3.5" />
+            Gemini Multimodal AI Vision
+            <Key className="w-3 h-3 ml-1 text-emerald-300 opacity-75" />
+          </button>
+        </div>
       </div>
 
       {/* Main Upload Card */}
@@ -464,6 +479,9 @@ export const UploadPage: React.FC<UploadPageProps> = ({ onAnalysisComplete }) =>
           </div>
         </div>
       )}
+
+      {/* Gemini AI Key Modal */}
+      <GeminiKeyModal isOpen={showKeyModal} onClose={() => setShowKeyModal(false)} />
 
     </div>
   );

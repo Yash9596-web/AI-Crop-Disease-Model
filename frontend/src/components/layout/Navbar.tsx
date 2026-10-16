@@ -12,8 +12,10 @@ import {
   User as UserIcon,
   LogOut,
   Globe,
-  Plus
+  Plus,
+  Key
 } from 'lucide-react';
+import { GeminiKeyModal } from '../ui/GeminiKeyModal';
 
 interface NavbarProps {
   currentTab: string;
@@ -23,6 +25,7 @@ interface NavbarProps {
 export const Navbar: React.FC<NavbarProps> = ({ currentTab, onNavigate }) => {
   const { user, logout, openAuthModal, language, setLanguage, t } = useAuth();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const [showKeyModal, setShowKeyModal] = useState(false);
 
   const handleNav = (tab: string) => {
     onNavigate(tab);
@@ -109,6 +112,15 @@ export const Navbar: React.FC<NavbarProps> = ({ currentTab, onNavigate }) => {
           {/* Desktop Right Controls (Theme, Language & Auth) */}
           <div className="hidden md:flex items-center space-x-3">
             {/* Dark / Light Theme Toggle */}
+            {/* AI Vision Model Key */}
+            <button
+              onClick={() => setShowKeyModal(true)}
+              className="p-2.5 rounded-xl text-emerald-600 dark:text-emerald-400 hover:bg-emerald-50 dark:hover:bg-emerald-950/40 border border-emerald-500/20 transition-all btn-tactile"
+              title="Configure Gemini AI Vision Key"
+            >
+              <Key className="w-4 h-4" />
+            </button>
+
             <ThemeToggle />
 
             {/* Language Switcher */}
@@ -286,6 +298,9 @@ export const Navbar: React.FC<NavbarProps> = ({ currentTab, onNavigate }) => {
           </div>
         </div>
       )}
+
+      {/* Gemini AI Key Modal */}
+      <GeminiKeyModal isOpen={showKeyModal} onClose={() => setShowKeyModal(false)} />
     </header>
   );
 };

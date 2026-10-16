@@ -60,6 +60,63 @@ apiClient.interceptors.response.use(
   }
 );
 
+async function optimizeImageForUpload(file: File): Promise<File> {
+  // If already small (under 800KB), use directly
+  if (file.size < 800 * 1024) return file;
+
+  return new Promise((resolve) => {
+    try {
+      const img = new Image();
+      const url = URL.createObjectURL(file);
+      img.onload = () => {
+        URL.revokeObjectURL(url);
+        const maxDim = 1280;
+        let { width, height } = img;
+        if (width > maxDim || height > maxDim) {
+          if (width > height) {
+            height = Math.round((height * maxDim) / width);
+            width = maxDim;
+          } else {
+            width = Math.round((width * maxDim) / height);
+            height = maxDim;
+          }
+        } else {
+          resolve(file);
+          return;
+        }
+
+        const canvas = document.createElement('canvas');
+        canvas.width = width;
+        canvas.height = height;
+        const ctx = canvas.getContext('2d');
+        if (!ctx) {
+          resolve(file);
+          return;
+        }
+        ctx.drawImage(img, 0, 0, width, height);
+        canvas.toBlob(
+          (blob) => {
+            if (blob) {
+              resolve(new File([blob], file.name.replace(/\.[^/.]+$/, "") + ".jpg", { type: 'image/jpeg' }));
+            } else {
+              resolve(file);
+            }
+          },
+          'image/jpeg',
+          0.88
+        );
+      };
+      img.onerror = () => {
+        URL.revokeObjectURL(url);
+        resolve(file);
+      };
+      img.src = url;
+    } catch {
+      resolve(file);
+    }
+  });
+}
+
 export const api = {
   // Authentication
   auth: {
@@ -93,22 +150,40 @@ export const api = {
 
   // Disease Prediction
   predict: {
+    checkHealth: async () => {
+      try {
+        const res = await axios.get('/api/health', { timeout: 5000 });
+        return res.data;
+      } catch {
+        return null;
+      }
+    },
+
     analyzeLeaf: async (imageFile: File, cropType?: string): Promise<PredictResponse> => {
+      const optimizedFile = await optimizeImageForUpload(imageFile);
       const formData = new FormData();
-      formData.append('image', imageFile);
+      formData.append('image', optimizedFile);
       if (cropType && cropType !== 'All' && cropType !== 'Other') {
         formData.append('crop_type', cropType);
       }
 
-      // Tier 1: Try configured API client (timeout 12s)
+      // Check if user provided custom Gemini key in settings/localStorage
+      const customKey = (localStorage.getItem('crop_gemini_api_key') || '').trim();
+      const customHeaders: Record<string, string> = {
+        'Content-Type': 'multipart/form-data',
+      };
+      if (customKey) {
+        customHeaders['X-Gemini-Key'] = customKey;
+        formData.append('gemini_api_key', customKey);
+      }
+
+      // Tier 1: Try configured API client (timeout 18s)
       try {
         const res = await apiClient.post<PredictResponse>('/predict', formData, {
-          timeout: 12000,
-          headers: {
-            'Content-Type': 'multipart/form-data',
-          },
+          timeout: 18000,
+          headers: customHeaders,
         });
-        if (res.data && res.data.disease) {
+        if (res.data && (res.data.disease || res.data.is_plant === false)) {
           return res.data;
         }
       } catch (err: any) {
@@ -119,12 +194,10 @@ export const api = {
       if (API_BASE !== '/api') {
         try {
           const directRes = await axios.post<PredictResponse>('/api/predict', formData, {
-            timeout: 12000,
-            headers: {
-              'Content-Type': 'multipart/form-data',
-            },
+            timeout: 18000,
+            headers: customHeaders,
           });
-          if (directRes.data && directRes.data.disease) {
+          if (directRes.data && (directRes.data.disease || directRes.data.is_plant === false)) {
             return directRes.data;
           }
         } catch (edgeErr: any) {
@@ -132,7 +205,7 @@ export const api = {
         }
       }
 
-      // Tier 3: Guaranteed instant botanical pathology diagnosis
+      // Tier 3: Guaranteed botanical pathology diagnosis
       return await clientSideDiagnose(imageFile, cropType);
     },
   },

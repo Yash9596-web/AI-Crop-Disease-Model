@@ -67,6 +67,17 @@ Respond with ONLY a valid JSON object matching this schema:
   }
 }`;
 
+function arrayBufferToBase64(buffer) {
+  const bytes = new Uint8Array(buffer);
+  const len = bytes.byteLength;
+  const chunkSize = 0x8000; // 32KB chunking avoids call stack and CPU limits
+  const parts = [];
+  for (let i = 0; i < len; i += chunkSize) {
+    parts.push(String.fromCharCode.apply(null, bytes.subarray(i, i + chunkSize)));
+  }
+  return btoa(parts.join(''));
+}
+
 async function handlePredict(request, env) {
   try {
     const formData = await request.formData();
@@ -129,17 +140,19 @@ async function handlePredict(request, env) {
       );
     }
 
-    const apiKey = env.GEMINI_API_KEY || env.GOOGLE_API_KEY;
+    // Resolve API key: Priority to header/form key, then Cloudflare Worker environment secret
+    const clientKey = (request.headers.get('x-gemini-key') || (formData.get('gemini_api_key') || '')).toString();
+    const rawEnvKey = (env.GEMINI_API_KEY || env.GOOGLE_API_KEY || env.VITE_GEMINI_API_KEY || '').toString();
+    const apiKey = (clientKey || rawEnvKey).trim().replace(/^["']|["']$/g, '');
+
+    let lastGeminiError = '';
+    let geminiAttempted = false;
 
     if (apiKey) {
+      geminiAttempted = true;
       try {
         const arrayBuffer = await imageFile.arrayBuffer();
-        const bytes = new Uint8Array(arrayBuffer);
-        let binary = '';
-        for (let i = 0; i < bytes.byteLength; i++) {
-          binary += String.fromCharCode(bytes[i]);
-        }
-        const base64Data = btoa(binary);
+        const base64Data = arrayBufferToBase64(arrayBuffer);
         const mimeType = imageFile.type || 'image/jpeg';
 
         const userCropPrompt = cropHint ? `\nSpecimen crop confirmed by grower: ${cropHint}. Focus pathology on this crop.` : '';
@@ -179,9 +192,16 @@ async function handlePredict(request, env) {
               }
             } else {
               const errBody = await geminiRes.text();
+              let msg = errBody;
+              try {
+                const parsedErr = JSON.parse(errBody);
+                msg = parsedErr.error?.message || errBody;
+              } catch {}
+              lastGeminiError = `Model ${modelName}: HTTP ${geminiRes.status} (${msg})`;
               console.warn(`Gemini model ${modelName} returned status ${geminiRes.status}:`, errBody);
             }
           } catch (modelErr) {
+            lastGeminiError = `Model ${modelName}: ${modelErr.message}`;
             console.warn(`Gemini model ${modelName} fetch error:`, modelErr);
           }
         }
@@ -286,7 +306,7 @@ async function handlePredict(request, env) {
                 severity: parsed.severity || (isHealthy ? 'Healthy' : 'Moderate'),
                 is_healthy: isHealthy,
                 created_at: new Date().toISOString(),
-                safety_disclaimer: 'This AI prediction is intended as an initial screening and educational aid. For significant crop damage or uncertain results, consult a qualified agricultural expert.',
+                safety_disclaimer: 'Multimodal Gemini Vision Pathology Active. For critical commercial crop damage, consult a local agronomist.',
                 symptoms: Array.isArray(parsed.symptoms) && parsed.symptoms.length > 0 ? parsed.symptoms : ['Foliar discoloration or necrotic spotting observed on leaf blade.'],
                 treatment: {
                   immediate_actions: immediateActions,
@@ -306,15 +326,22 @@ async function handlePredict(request, env) {
           }
         }
       } catch (geminiErr) {
+        lastGeminiError = `Worker processing error: ${geminiErr.message}`;
         console.error('Gemini call error on worker:', geminiErr);
       }
     }
 
-    // Edge Heuristic Fallback (Used when Gemini is offline or not configured)
+    // Edge Heuristic Fallback (Used when Gemini is offline, key is invalid, or not configured)
     const fallbackCrop = cropHint && cropHint !== 'All' ? cropHint : (fileName.includes('potato') ? 'Potato' : 'Crop Foliage');
     const isPotato = fallbackCrop.toLowerCase().includes('potato') || fileName.includes('potato');
     const fallbackDisease = isPotato ? 'Early Blight' : 'Leaf Spot';
     const fallbackConfidence = cropHint ? 0.88 : 0.72;
+
+    const fallbackDisclaimer = lastGeminiError
+      ? `Gemini API attempt encountered an error: "${lastGeminiError}". Edge offline pathology rules were used instead.`
+      : geminiAttempted
+      ? 'Gemini vision request did not return valid candidates. Edge offline pathology rules used.'
+      : 'Edge heuristic screening active. Connect a valid GEMINI_API_KEY in Cloudflare environment variables or enter your key in App Settings for deep multimodal AI.';
 
     return new Response(
       JSON.stringify({
@@ -330,7 +357,7 @@ async function handlePredict(request, env) {
         severity: 'Moderate',
         is_healthy: false,
         created_at: new Date().toISOString(),
-        safety_disclaimer: 'Edge heuristic screening active. Connect a valid GEMINI_API_KEY in Cloudflare environment variables for deep multimodal neural analysis.',
+        safety_disclaimer: fallbackDisclaimer,
         symptoms: [
           'Dark circular or irregular spotting visible on leaf lamina',
           'Chlorotic yellow halos surrounding expanding necrotic lesions',
@@ -383,10 +410,17 @@ export default {
       return new Response(null, { status: 204, headers: CORS_HEADERS });
     }
 
-    // Health check
+    // Health check & diagnostic status
     if (url.pathname === '/api/health') {
+      const rawEnvKey = (env.GEMINI_API_KEY || env.GOOGLE_API_KEY || env.VITE_GEMINI_API_KEY || '').toString().trim();
       return new Response(
-        JSON.stringify({ status: 'ok', edge: 'cloudflare-worker', timestamp: new Date().toISOString() }),
+        JSON.stringify({
+          status: 'ok',
+          edge: 'cloudflare-worker',
+          gemini_key_detected: Boolean(rawEnvKey),
+          gemini_key_preview: rawEnvKey ? `${rawEnvKey.slice(0, 4)}...${rawEnvKey.slice(-4)}` : 'none',
+          timestamp: new Date().toISOString()
+        }),
         { status: 200, headers: { ...CORS_HEADERS, 'Content-Type': 'application/json' } }
       );
     }

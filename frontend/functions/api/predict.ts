@@ -68,17 +68,25 @@ export async function onRequestPost(context: any) {
       );
     }
 
-    const apiKey = env.GEMINI_API_KEY || env.GOOGLE_API_KEY;
+    // Resolve API key: Priority to header/form key, then Cloudflare Worker environment secret
+    const clientKey = (request.headers.get('x-gemini-key') || (formData.get('gemini_api_key') || '')).toString();
+    const rawEnvKey = (env.GEMINI_API_KEY || env.GOOGLE_API_KEY || env.VITE_GEMINI_API_KEY || '').toString();
+    const apiKey = (clientKey || rawEnvKey).trim().replace(/^["']|["']$/g, '');
+
+    let lastGeminiError = '';
+    let geminiAttempted = false;
 
     if (apiKey) {
+      geminiAttempted = true;
       try {
         const arrayBuffer = await imageFile.arrayBuffer();
         const bytes = new Uint8Array(arrayBuffer);
-        let binary = '';
-        for (let i = 0; i < bytes.byteLength; i++) {
-          binary += String.fromCharCode(bytes[i]);
+        const chunkSize = 0x8000;
+        const parts: string[] = [];
+        for (let i = 0; i < bytes.length; i += chunkSize) {
+          parts.push(String.fromCharCode.apply(null, Array.from(bytes.subarray(i, i + chunkSize))));
         }
-        const base64Data = btoa(binary);
+        const base64Data = btoa(parts.join(''));
         const mimeType = imageFile.type || 'image/jpeg';
 
         const userCropPrompt = cropHint ? `\nSpecimen crop confirmed by grower: ${cropHint}. Focus pathology on this crop.` : '';

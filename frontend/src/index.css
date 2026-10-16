@@ -1,0 +1,271 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  html {
+    scroll-behavior: smooth;
+    -webkit-tap-highlight-color: transparent;
+  }
+
+  html.dark {
+    color-scheme: dark;
+  }
+
+  body {
+    background-color: #F8FAF6;
+    color: #1A2E22;
+    transition: background-color 0.25s ease, color 0.25s ease;
+  }
+
+  html.dark body {
+    background-color: #07130E;
+    color: #F1F5F9;
+  }
+
+  /* Dark Theme Card, Border, and Text Elevation Adjustments */
+  html.dark .bg-white {
+    background-color: #0E1E17 !important;
+  }
+
+  html.dark .bg-white\/95 {
+    background-color: rgba(14, 30, 23, 0.95) !important;
+  }
+
+  html.dark .bg-white\/90 {
+    background-color: rgba(14, 30, 23, 0.9) !important;
+  }
+
+  html.dark .bg-gray-50 {
+    background-color: rgba(255, 255, 255, 0.04) !important;
+  }
+
+  html.dark .bg-gray-100 {
+    background-color: rgba(255, 255, 255, 0.08) !important;
+  }
+
+  html.dark .bg-agri-50 {
+    background-color: rgba(45, 106, 79, 0.22) !important;
+  }
+
+  html.dark .border-agri-100,
+  html.dark .border-agri-200 {
+    border-color: rgba(45, 106, 79, 0.35) !important;
+  }
+
+  html.dark .border-gray-100,
+  html.dark .border-gray-200 {
+    border-color: rgba(255, 255, 255, 0.1) !important;
+  }
+
+  html.dark .text-gray-900,
+  html.dark .text-agri-950,
+  html.dark .text-agri-900 {
+    color: #F8FAF6 !important;
+  }
+
+  html.dark .text-gray-800 {
+    color: #E2E8F0 !important;
+  }
+
+  html.dark .text-gray-700 {
+    color: #CBD5E1 !important;
+  }
+
+  html.dark .text-gray-600 {
+    color: #94A3B8 !important;
+  }
+
+  html.dark .text-gray-500 {
+    color: #94A3B8 !important;
+  }
+
+  html.dark .text-agri-800 {
+    color: #8FD8A0 !important;
+  }
+
+  html.dark .shadow-card,
+  html.dark .shadow-sm,
+  html.dark .shadow-md {
+    box-shadow: 0 10px 30px -4px rgba(0, 0, 0, 0.5) !important;
+  }
+}
+
+/* ================= ADVANCED MODERN MICRO-ANIMATIONS ================= */
+
+@keyframes shimmerSweep {
+  0% {
+    transform: translateX(-100%);
+  }
+  100% {
+    transform: translateX(200%);
+  }
+}
+
+@keyframes floatSlow {
+  0%, 100% {
+    transform: translateY(0px);
+  }
+  50% {
+    transform: translateY(-6px);
+  }
+}
+
+@keyframes glowPulse {
+  0%, 100% {
+    box-shadow: 0 0 15px rgba(16, 185, 129, 0.2), 0 0 30px rgba(16, 185, 129, 0.1);
+  }
+  50% {
+    box-shadow: 0 0 25px rgba(16, 185, 129, 0.45), 0 0 50px rgba(16, 185, 129, 0.2);
+  }
+}
+
+@keyframes gradientShift {
+  0% {
+    background-position: 0% 50%;
+  }
+  50% {
+    background-position: 100% 50%;
+  }
+  100% {
+    background-position: 0% 50%;
+  }
+}
+
+@keyframes radarSpin {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+/* Custom styling for scan line animation */
+@keyframes scanningBeam {
+  0% {
+    top: 0%;
+    opacity: 0.2;
+  }
+  15% {
+    opacity: 1;
+  }
+  85% {
+    opacity: 1;
+  }
+  100% {
+    top: 96%;
+    opacity: 0.2;
+  }
+}
+
+.animate-scan-beam {
+  animation: scanningBeam 2.4s ease-in-out infinite alternate;
+}
+
+.animate-float-slow {
+  animation: floatSlow 3.8s ease-in-out infinite;
+}
+
+.animate-glow-pulse {
+  animation: glowPulse 2.8s ease-in-out infinite;
+}
+
+.animate-gradient-shift {
+  background-size: 200% 200%;
+  animation: gradientShift 6s ease infinite;
+}
+
+.animate-radar {
+  animation: radarSpin 4s linear infinite;
+}
+
+/* Shimmer button / badge overlay */
+.btn-shimmer {
+  position: relative;
+  overflow: hidden;
+}
+.btn-shimmer::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 50%;
+  height: 100%;
+  background: linear-gradient(
+    90deg,
+    rgba(255, 255, 255, 0) 0%,
+    rgba(255, 255, 255, 0.22) 50%,
+    rgba(255, 255, 255, 0) 100%
+  );
+  transform: translateX(-100%);
+  pointer-events: none;
+}
+.btn-shimmer:hover::after {
+  animation: shimmerSweep 1.2s cubic-bezier(0.4, 0, 0.2, 1) infinite;
+}
+
+/* Interactive tactile elements */
+.interactive-card {
+  transition: transform 0.35s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.35s cubic-bezier(0.16, 1, 0.3, 1), border-color 0.35s ease;
+  will-change: transform, box-shadow;
+}
+.interactive-card:hover {
+  transform: translateY(-6px);
+  box-shadow: 0 20px 35px -8px rgba(16, 185, 129, 0.16), 0 0 0 1px rgba(16, 185, 129, 0.3);
+}
+
+html.dark .interactive-card:hover {
+  box-shadow: 0 20px 35px -8px rgba(16, 185, 129, 0.28), 0 0 0 1px rgba(52, 211, 153, 0.45) !important;
+}
+
+.btn-tactile {
+  cursor: pointer;
+  transition: transform 0.2s cubic-bezier(0.34, 1.56, 0.64, 1), box-shadow 0.2s ease, background-color 0.2s ease;
+  will-change: transform;
+  -webkit-tap-highlight-color: transparent;
+}
+.btn-tactile:hover {
+  transform: translateY(-2px) scale(1.02);
+}
+.btn-tactile:active {
+  transform: translateY(1px) scale(0.97);
+}
+
+/* Custom Sleek Scrollbar */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+::-webkit-scrollbar-thumb {
+  background: rgba(45, 106, 79, 0.25);
+  border-radius: 9999px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: rgba(45, 106, 79, 0.5);
+}
+html.dark ::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.18);
+}
+html.dark ::-webkit-scrollbar-thumb:hover {
+  background: rgba(16, 185, 129, 0.5);
+}
+
+/* Respect user's motion preferences (Section 23) */
+@media (prefers-reduced-motion: reduce) {
+  *, ::before, ::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
+
+/* Safe area for mobile navigation */
+.safe-area-bottom {
+  padding-bottom: max(0.5rem, env(safe-area-inset-bottom));
+}
+

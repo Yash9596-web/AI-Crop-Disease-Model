@@ -1,0 +1,43 @@
+# Environments & Dependencies
+venv/
+backend/venv/
+node_modules/
+frontend/node_modules/
+frontend/.vite/
+
+# Compiled files & caches
+__pycache__/
+*.py[cod]
+*$py.class
+.pytest_cache/
+.coverage
+htmlcov/
+dist/
+frontend/dist/
+
+# Local databases & uploads (seeded automatically on startup)
+*.db
+backend/crop_disease.db
+crop_disease.db
+backend/uploads/*.jpg
+backend/uploads/*.png
+backend/uploads/*.webp
+backend/uploads/thumbnails/*
+!backend/uploads/.gitkeep
+temp_leaves/
+
+# Environment Variables & Secrets
+.env
+backend/.env
+
+# Large temporary/media files
+reference_video.mp4
+*.mp4
+
+# IDE & OS
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db
+*.log
+.agent/

@@ -1,0 +1,98 @@
+{
+  "timestamp": "2026-10-16T05:57:20Z",
+  "model_type": "Gemini-Flash-Vision",
+  "metrics": {
+    "total_test_cases": 6,
+    "crop_accuracy_pct": 100.0,
+    "disease_accuracy_pct": 100.0,
+    "health_state_accuracy_pct": 100.0,
+    "average_confidence_pct": 95.67,
+    "guidance_completeness_pct": 100.0
+  },
+  "test_results": [
+    {
+      "test_id": "TC-01",
+      "expected_crop": "Tomato",
+      "expected_disease": "Early Blight",
+      "outer_source": "PlantVillage Benchmark #14 (Tomato Early Blight) / USDA ARS Key",
+      "predicted_crop": "Tomato",
+      "predicted_disease": "Early Blight",
+      "confidence": 0.95,
+      "crop_match": true,
+      "disease_match": true,
+      "health_match": true,
+      "treatment_complete": true,
+      "top_candidate": "Tomato \u2014 Early Blight"
+    },
+    {
+      "test_id": "TC-02",
+      "expected_crop": "Tomato",
+      "expected_disease": "Healthy",
+      "outer_source": "PlantVillage Benchmark #23 (Tomato Healthy)",
+      "predicted_crop": "Tomato",
+      "predicted_disease": "Healthy",
+      "confidence": 0.99,
+      "crop_match": true,
+      "disease_match": true,
+      "health_match": true,
+      "treatment_complete": true,
+      "top_candidate": "Tomato \u2014 Healthy"
+    },
+    {
+      "test_id": "TC-03",
+      "expected_crop": "Corn",
+      "expected_disease": "Common Rust",
+      "outer_source": "PlantVillage Benchmark #08 (Corn Common Rust) / Iowa State Extension",
+      "predicted_crop": "Corn",
+      "predicted_disease": "Common Rust",
+      "confidence": 0.95,
+      "crop_match": true,
+      "disease_match": true,
+      "health_match": true,
+      "treatment_complete": true,
+      "top_candidate": "Corn \u2014 Common Rust"
+    },
+    {
+      "test_id": "TC-04",
+      "expected_crop": "Rice",
+      "expected_disease": "Brown Spot",
+      "outer_source": "IRRI (International Rice Research Institute) Diagnostic Guide",
+      "predicted_crop": "Rice",
+      "predicted_disease": "Brown Spot",
+      "confidence": 0.95,
+      "crop_match": true,
+      "disease_match": true,
+      "health_match": true,
+      "treatment_complete": true,
+      "top_candidate": "Rice \u2014 Brown Spot"
+    },
+    {
+      "test_id": "TC-05",
+      "expected_crop": "Wheat",
+      "expected_disease": "Rust",
+      "outer_source": "CIMMYT Global Wheat Pathology Compendium",
+      "predicted_crop": "Wheat",
+      "predicted_disease": "Common Rust / Leaf Rust",
+      "confidence": 0.95,
+      "crop_match": true,
+      "disease_match": true,
+      "health_match": true,
+      "treatment_complete": true,
+      "top_candidate": "Wheat \u2014 Common Rust / Leaf Rust"
+    },
+    {
+      "test_id": "TC-06",
+      "expected_crop": "Sweet Potato",
+      "expected_disease": "Cercospora Leaf Spot",
+      "outer_source": "CIP (International Potato Center) Foliar Pathogens Key",
+      "predicted_crop": "Sweet Potato",
+      "predicted_disease": "Cercospora Leaf Spot",
+      "confidence": 0.95,
+      "crop_match": true,
+      "disease_match": true,
+      "health_match": true,
+      "treatment_complete": true,
+      "top_candidate": "Sweet Potato \u2014 Cercospora Leaf Spot"
+    }
+  ]
+}

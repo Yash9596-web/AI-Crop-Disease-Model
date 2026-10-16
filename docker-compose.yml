@@ -1,0 +1,36 @@
+version: '3.8'
+
+services:
+  ai-crop-disease-app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    image: ai-crop-disease-app:latest
+    container_name: ai_crop_disease_container
+    restart: unless-stopped
+    ports:
+      - "8000:8000"
+    environment:
+      - PORT=8000
+      - HOST=0.0.0.0
+      - ENVIRONMENT=production
+      - DEBUG=false
+      - GEMINI_API_KEY=${GEMINI_API_KEY:-}
+      - JWT_SECRET=${JWT_SECRET:-supersecretcropdiseasejwtkey2026agriculturesecuretoken!}
+      - CORS_ORIGINS=*
+    volumes:
+      # Persistent storage for uploads and database
+      - app_uploads:/app/backend/uploads
+      - app_data:/app/backend/data
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8000/api/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 15s
+
+volumes:
+  app_uploads:
+    driver: local
+  app_data:
+    driver: local

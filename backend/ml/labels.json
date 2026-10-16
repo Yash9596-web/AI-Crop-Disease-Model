@@ -1,0 +1,260 @@
+{
+  "classes": [
+    {
+      "index": 0,
+      "class_id": "tomato_early_blight",
+      "crop": "Tomato",
+      "disease": "Early Blight",
+      "display_name": "Tomato Early Blight",
+      "is_healthy": false
+    },
+    {
+      "index": 1,
+      "class_id": "tomato_late_blight",
+      "crop": "Tomato",
+      "disease": "Late Blight",
+      "display_name": "Tomato Late Blight",
+      "is_healthy": false
+    },
+    {
+      "index": 2,
+      "class_id": "tomato_yellow_leaf_curl",
+      "crop": "Tomato",
+      "disease": "Yellow Leaf Curl Virus",
+      "display_name": "Tomato Yellow Leaf Curl Virus",
+      "is_healthy": false
+    },
+    {
+      "index": 3,
+      "class_id": "tomato_bacterial_spot",
+      "crop": "Tomato",
+      "disease": "Bacterial Spot",
+      "display_name": "Tomato Bacterial Spot",
+      "is_healthy": false
+    },
+    {
+      "index": 4,
+      "class_id": "tomato_septoria_leaf_spot",
+      "crop": "Tomato",
+      "disease": "Septoria Leaf Spot",
+      "display_name": "Tomato Septoria Leaf Spot",
+      "is_healthy": false
+    },
+    {
+      "index": 5,
+      "class_id": "tomato_healthy",
+      "crop": "Tomato",
+      "disease": "Healthy",
+      "display_name": "Tomato (Healthy)",
+      "is_healthy": true
+    },
+    {
+      "index": 6,
+      "class_id": "potato_early_blight",
+      "crop": "Potato",
+      "disease": "Early Blight",
+      "display_name": "Potato Early Blight",
+      "is_healthy": false
+    },
+    {
+      "index": 7,
+      "class_id": "potato_late_blight",
+      "crop": "Potato",
+      "disease": "Late Blight",
+      "display_name": "Potato Late Blight",
+      "is_healthy": false
+    },
+    {
+      "index": 8,
+      "class_id": "potato_healthy",
+      "crop": "Potato",
+      "disease": "Healthy",
+      "display_name": "Potato (Healthy)",
+      "is_healthy": true
+    },
+    {
+      "index": 9,
+      "class_id": "corn_common_rust",
+      "crop": "Corn",
+      "disease": "Common Rust",
+      "display_name": "Corn Common Rust",
+      "is_healthy": false
+    },
+    {
+      "index": 10,
+      "class_id": "corn_northern_leaf_blight",
+      "crop": "Corn",
+      "disease": "Northern Leaf Blight",
+      "display_name": "Corn Northern Leaf Blight",
+      "is_healthy": false
+    },
+    {
+      "index": 11,
+      "class_id": "corn_cercospora_leaf_spot",
+      "crop": "Corn",
+      "disease": "Cercospora Leaf Spot",
+      "display_name": "Corn Cercospora Leaf Spot",
+      "is_healthy": false
+    },
+    {
+      "index": 12,
+      "class_id": "corn_healthy",
+      "crop": "Corn",
+      "disease": "Healthy",
+      "display_name": "Corn (Healthy)",
+      "is_healthy": true
+    },
+    {
+      "index": 13,
+      "class_id": "apple_apple_scab",
+      "crop": "Apple",
+      "disease": "Apple Scab",
+      "display_name": "Apple Scab",
+      "is_healthy": false
+    },
+    {
+      "index": 14,
+      "class_id": "apple_black_rot",
+      "crop": "Apple",
+      "disease": "Black Rot",
+      "display_name": "Apple Black Rot",
+      "is_healthy": false
+    },
+    {
+      "index": 15,
+      "class_id": "apple_cedar_apple_rust",
+      "crop": "Apple",
+      "disease": "Cedar Apple Rust",
+      "display_name": "Apple Cedar Rust",
+      "is_healthy": false
+    },
+    {
+      "index": 16,
+      "class_id": "apple_healthy",
+      "crop": "Apple",
+      "disease": "Healthy",
+      "display_name": "Apple (Healthy)",
+      "is_healthy": true
+    },
+    {
+      "index": 17,
+      "class_id": "grape_black_rot",
+      "crop": "Grape",
+      "disease": "Black Rot",
+      "display_name": "Grape Black Rot",
+      "is_healthy": false
+    },
+    {
+      "index": 18,
+      "class_id": "grape_esca",
+      "crop": "Grape",
+      "disease": "Esca (Black Measles)",
+      "display_name": "Grape Esca",
+      "is_healthy": false
+    },
+    {
+      "index": 19,
+      "class_id": "grape_leaf_blight",
+      "crop": "Grape",
+      "disease": "Leaf Blight",
+      "display_name": "Grape Leaf Blight",
+      "is_healthy": false
+    },
+    {
+      "index": 20,
+      "class_id": "grape_healthy",
+      "crop": "Grape",
+      "disease": "Healthy",
+      "display_name": "Grape (Healthy)",
+      "is_healthy": true
+    },
+    {
+      "index": 21,
+      "class_id": "rice_brown_spot",
+      "crop": "Rice",
+      "disease": "Brown Spot",
+      "display_name": "Rice Brown Spot",
+      "is_healthy": false
+    },
+    {
+      "index": 22,
+      "class_id": "rice_leaf_blast",
+      "crop": "Rice",
+      "disease": "Leaf Blast",
+      "display_name": "Rice Leaf Blast",
+      "is_healthy": false
+    },
+    {
+      "index": 23,
+      "class_id": "rice_bacterial_blight",
+      "crop": "Rice",
+      "disease": "Bacterial Blight",
+      "display_name": "Rice Bacterial Blight",
+      "is_healthy": false
+    },
+    {
+      "index": 24,
+      "class_id": "rice_healthy",
+      "crop": "Rice",
+      "disease": "Healthy",
+      "display_name": "Rice (Healthy)",
+      "is_healthy": true
+    },
+    {
+      "index": 25,
+      "class_id": "wheat_leaf_rust",
+      "crop": "Wheat",
+      "disease": "Leaf Rust",
+      "display_name": "Wheat Leaf Rust",
+      "is_healthy": false
+    },
+    {
+      "index": 26,
+      "class_id": "wheat_stripe_rust",
+      "crop": "Wheat",
+      "disease": "Stripe Rust",
+      "display_name": "Wheat Stripe Rust",
+      "is_healthy": false
+    },
+    {
+      "index": 27,
+      "class_id": "wheat_powdery_mildew",
+      "crop": "Wheat",
+      "disease": "Powdery Mildew",
+      "display_name": "Wheat Powdery Mildew",
+      "is_healthy": false
+    },
+    {
+      "index": 28,
+      "class_id": "wheat_healthy",
+      "crop": "Wheat",
+      "disease": "Healthy",
+      "display_name": "Wheat (Healthy)",
+      "is_healthy": true
+    },
+    {
+      "index": 29,
+      "class_id": "cotton_bacterial_blight",
+      "crop": "Cotton",
+      "disease": "Bacterial Blight",
+      "display_name": "Cotton Bacterial Blight (Angular Leaf Spot)",
+      "is_healthy": false
+    },
+    {
+      "index": 30,
+      "class_id": "cotton_target_spot",
+      "crop": "Cotton",
+      "disease": "Target Spot",
+      "display_name": "Cotton Target Spot",
+      "is_healthy": false
+    },
+    {
+      "index": 31,
+      "class_id": "cotton_healthy",
+      "crop": "Cotton",
+      "disease": "Healthy",
+      "display_name": "Cotton (Healthy)",
+      "is_healthy": true
+    }
+  ]
+}

@@ -1,0 +1,23 @@
+services:
+  - type: web
+    name: ai-crop-disease-detection
+    env: docker
+    dockerfilePath: ./Dockerfile
+    dockerContext: .
+    plan: free
+    region: oregon
+    autoDeploy: true
+    healthCheckPath: /api/health
+    envVars:
+      - key: ENVIRONMENT
+        value: production
+      - key: DEBUG
+        value: "false"
+      - key: PORT
+        value: "8000"
+      - key: CORS_ORIGINS
+        value: "*"
+      - key: GEMINI_API_KEY
+        sync: false # Set in Render Dashboard -> Environment Variables
+      - key: JWT_SECRET
+        generateValue: true
